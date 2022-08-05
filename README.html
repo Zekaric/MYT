@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+
+ <head>
+  <meta charset="utf-8" />
+  <link rel="stylesheet" type="text/css" href="style_reset.css">
+  <link rel="stylesheet" type="text/css" href="style_zdoc.css">
+  <title>Zekaric: Manage Your Tasks (ZMYT or My Tea)</title>
+ </head>
+
+ <body class="zdoc">
+
+
+<h1 class="zdoc">Zekaric: Manage Your Tasks (ZMYT or My Tea)</h1>
+
+<h2 class="zdoc">Table Of Contents</h2>
+<p class="zdoc_toc1"><a href="#1">1 - Summary</a></p>
+<p class="zdoc_toc1"><a href="#2">2 - Discussion</a></p>
+<p class="zdoc_toc1"><a href="#3">3 - Goals</a></p>
+<p class="zdoc_toc1"><a href="#4">4 - Compormises</a></p>
+<p class="zdoc_toc1"><a href="#5">5 - Design</a></p>
+<p class="zdoc_toc1"><a href="#6">6 - Warning</a></p>
+<p class="zdoc_toc1"><a href="#7">7 - Install</a></p>
+
+
+<h1 class="zdoc"><a name="1">1 - Summary</a></h1>
+<p class="zdoc">My Tea is a web based task manager for an internal network.  I.E. hosted on a local NAS for instance</p>
+
+
+<h1 class="zdoc"><a name="2">2 - Discussion</a></h1>
+<p class="zdoc">I had made an attempt before using more JavaScript and more client side processing but I found that maddening because of the two different languages to have to deal with.  In the end after a time away, I felt I couldn't get back into the development because I forgot how it all worked together.  So in the end, it was not simple enough.  It could be made simpler and I have learnt a few things about PHP which I was doing incorrectly with my previous work.</p>
+<p class="zdoc">This project basically uses no JavaScript.  It is all PHP.  No Database.  Data is stored in PHP source files.</p>
+
+
+<h1 class="zdoc"><a name="3">3 - Goals</a></h1>
+<ul class="zdoc">
+<li class="zdoc">Simple coding.</li>
+<li class="zdoc">Simple design.</li>
+<li class="zdoc">Simple maintenance.</li>
+<li class="zdoc">Short development time.</li>
+</ul>
+
+
+<h1 class="zdoc"><a name="4">4 - Compormises</a></h1>
+<ul class="zdoc">
+<li class="zdoc">Performance</li>
+</ul>
+<p class="zdoc">When the number of tasks become large, manipulation will become quite a bit slower.  I am not too concerned about this because it isn't intended to be used in a multi-user environment or for millions of tasks.  Most people have maybe at most a hundred tasks.  At that amount the performance will never be noticeable.</p>
+
+
+<h1 class="zdoc"><a name="5">5 - Design</a></h1>
+<p class="zdoc">Keeping it stupidly simple (KISS)</p>
+<p class="zdoc">The data will be found in php files.  So that the PHP parser will be parsing the data as well as populating the internal structure at the same time instead of having the data in an external foreign format and having to write code to import/access that data.  This will include SQL or SQLite files and such.  So in a way this should be faster than importing the data from a foreign source.  It will mean sort of a weird and hacky like data access and storage though.</p>
+
+
+<h1 class="zdoc"><a name="6">6 - Warning</a></h1>
+<p class="zdoc">This code is intended to be run internally on a secure network and not open to the public.  It is not coded in a way for public access.</p>
+<p class="zdoc">This program is intended to be used by a single person.  Multiple users may work but it is not guaranteed.  There is no user tracking in this code.</p>
+
+
+<h1 class="zdoc"><a name="7">7 - Install</a></h1>
+<p class="zdoc">Copy the files to a browser accessable folder on your web server.</p>
+<p class="zdoc">Point your browser to that folder and you should be done.</p>
+<p class="zdoc">The only potential gotcha may be tha you will have to ...</p>
+<pre class="zdoc">
+chown www-data:www-data *
+</pre>
+<p class="zdoc">... and maybe ...</p>
+<pre class="zdoc">
+chmod 755 *
+</pre>
+<p class="zdoc">... on the files in that folder for it to work properly.</p>
+<p class="zdoc">On your web server you <strong>will</strong> need to update your php.ini file.  By default it will cache the last run of a file and will not look at file updates unless you tell it to.  In the php.ini file look for a variable...</p>
+<pre class="zdoc">
+opcache.enable = ...
+opcache.revalidate_freq = ...
+</pre>
+<p class="zdoc">I set both to 0 but I think you only need to set either to 0.  "revalidate_freq" is basically telling PHP to check the file every time it is to use a file.  In this code base this is necessary as I'm treating a php file as the data file and updating it on the fly.  If the frequency is too slow you may end up with a display that isn't matching what you have actually changed.</p>
+ </body>
+
+</html>
