@@ -1,42 +1,35 @@
 ###############################################################################
-# file:       MYT_main
+# file:       MytUtil
 # author:     Robbert de Groot
 # company:    Zekaric
 # copyright:  2022, Zekaric
 # 
 # description:
-# 
+# Utility functions
 ###############################################################################
 
 ###############################################################################
-# imports:
+# import
 ###############################################################################
-from MytUtil import *
-
-import cgi, cgitb
-
-import MytState
-import MytProjList
-import MytTaskList
-import MytCommand
-import MytDisplay
 
 ###############################################################################
-# The main program
+# global
+# function
 ###############################################################################
-def Start():
+def IntFromStr(value: str) -> int:
+   return int(value)
 
-   # ensure errors are shown to the web page.
-   cgitb.enable()
-   #cgitb.enable(display = 0, logdir = "/PythonScript.log")
+def StrFromInt(value: int) -> str:
+   return str(value)
+   
+# Python fucked up here.  Above we have int conversion.  Looks sane.  You'd 
+# expect bool(str) to work the same.  NO IT DOESN'T.  That's fucked up.
+def BoolFromStr(value: str) -> bool:
+   # "True" for backwards compatibility
+   # "1" for alternative
+   return value == "T" or value == "True" or value == "1"
 
-   # create the classes.
-   MytProjList.Start();
-   MytTaskList.Start();
-   MytState.Start();
-
-   # Process the command 
-   MytCommand.Process(cgi.FieldStorage())
-
-   # Display the page
-   MytDisplay.Process()
+def StrFromBool(value: bool) -> str:
+   if (value):
+      return "T"
+   return "F"

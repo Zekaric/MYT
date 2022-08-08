@@ -7,50 +7,53 @@
 # description:
 # Web site commands.
 #
-# l        - switch from displaying the item list or the project list.
+# l             - switch from displaying the item list or the project list.
+#     
+# dw            - toggle work visibility
+# dt            - toggle test visibility
+# dd            - toggle doc  visibility
+# dr            - toggle rel  visibility
+# dx            - toggle done visibility
 #
-# p-[ID]   - hide project items
-# p+[ID]   - show project items
-# p0       - hide all project items.
-# p1       - show all project items.
-# pa[Name] - add a new project.
-# pn[Name] - rename a project.
-# pd[Desc] - add a description for the project.
-# p=[ID]   - set the current project.
+# pv[ID]        - toggle visibility
+# p0            - hide all project items.
+# p1            - show all project items.
+# pa[ID] [Name] - add a new project.
+# pn[ID] [Name] - rename a project.
+# pd[ID] [Desc] - add a description for the project.
 #
-# ia[Desc] - add a new item to the current project.
-# id[Desc] - edit a description.
-# iP[ID]   - set the project id.
-# ip[VAL]  - set the priority VAL = 1-6 or x - xxxxx
-# ie[VAL]  - set the effort   VAL = 1-6 or x - xxxxx, inf
-# is[VAL]  - set the state    VAL = WORK_TODO, WORK_IN_PROG
-#                                   TEST_TODO, TEST_IN_PROG
-#                                   DOC_TODO,  DOC_IN_PROG
-#                                   REL_TODO,  REL_IN_PROG
-#                                   ARCHIVE
-# iS+      - progress the item state.
-# iS-      - regress  the item state.
-# i=[ID]   - set the current item
+# ta[ID] [Desc] - add a new item to the current project.
+# td[ID] [Desc] - edit a description.
+# tP[ID]        - set the project id.
+# tp[ID] [VAL]  - set the priority VAL = 1, 2, 3, 4, 5, 6 
+# te[ID] [VAL]  - set the effort   VAL = 1, 2, 3, 4, 5, 6, i
+# ts[ID] [VAL]  - set the state    VAL = wt, wp, tt, tp, dt, dp, rt, rp, dn
+# tS[ID] +      - progress the item state.
+# tS[ID] -      - regress  the item state.
 ###############################################################################
 
 ###############################################################################
 # imports:
 ###############################################################################
+from MytUtil import *
+
 import cgi
 
-from dataclasses import dataclass
-
 import MytProj
-import MytTast
+import MytProjList
+import MytTask
+import MytTaskList
 import MytState
+import MytDisplay
 
 ###############################################################################
 # local
 # constants
 ###############################################################################
-@dataclass
 class MYT_COMMAND:
    CMD             : str = 'cmd'
+   ID              : str = 'id'
+   VALUE           : str = 'val'
 
    CMD_LIST        : str = 'l'
    CMD_PROJECT     : str = 'p'
@@ -70,12 +73,12 @@ class MYT_COMMAND:
    DESC            : str = 'd'
    STATE           : str = 's'
    
-   VAL1            : str = 'x'
-   VAL2            : str = 'xx'
-   VAL3            : str = 'xxx'
-   VAL4            : str = 'xxxx'
-   VAL5            : str = 'xxxxx'
-   VALI            : str = 'inf'
+   VAL1            : str = '1'
+   VAL2            : str = '2'
+   VAL3            : str = '3'
+   VAL4            : str = '4'
+   VAL5            : str = '5'
+   VALI            : str = 'i'
    
    STATE_WORK_TODO : str = 'wt'
    STATE_WORK_PROG : str = 'wp'
@@ -95,13 +98,25 @@ class MYT_COMMAND:
 # process the command.
 ###############################################################################
 def Process(form) -> bool:
-   
-   if MYT_COMMAND.CMD not in form:
-      return False
 
-   commandFull = form.getvalue(MYT_COMMAND.CMD)
+   command = ""
+   id      = 0
+   value   = ""
+   if (False):
+      command = "l"
+      id      = 0
+      value   = ""
 
-   return _Process(commandFull)
+   if (MYT_COMMAND.CMD in form):
+      command = form.getvalue(MYT_COMMAND.CMD)
+
+   if (MYT_COMMAND.ID in form):
+      id = IntFromStr(form.getvalue(MYT_COMMAND.ID))
+
+   if (MYT_COMMAND.VALUE in form):
+      value = form.getvalue(MYT_COMMAND.VALUE)
+
+   return _Process(command, id, value)
 
 ###############################################################################
 # local 
@@ -110,19 +125,19 @@ def Process(form) -> bool:
 ###############################################################################
 # Process the command string.
 ###############################################################################
-def _Process(line: str) -> bool:
-   
+def _Process(line: str, id: int, value: str) -> bool:
+
    command = line[0:1]
    rest    = line[1:]
 
-   if   command == 'l':
-      return _ProcessList(rest)
+   if   (command == 'l'):
+      return _ProcessList(rest, id, value)
 
-   elif command == 'i':
-      return _ProcessTask(rest)
+   elif (command == 't'):
+      return _ProcessTask(rest, id, value)
 
-   elif command == 'p':
-      return _ProcessProj(rest)
+   elif (command == 'p'):
+      return _ProcessProj(rest, id, value)
 
    # Unknown command
    return False
@@ -130,59 +145,53 @@ def _Process(line: str) -> bool:
 ###############################################################################
 # process the list command
 ###############################################################################
-def _ProcessList(line: str) -> bool:
+def _ProcessList(line: str, id: int, value: str) -> bool:
 
-   MytState.SetIsShowingProjectList(!MytState.IsShowingProjectList())
+   MytState.SetIsShowingProjList(not MytState.IsShowingProjList())
 
    return MytState.FileStore();
 
 ###############################################################################
 # Process the project command
 ###############################################################################
-def _ProcessProj(line: str) -> bool:
+def _ProcessProj(line: str, id: int, value: str) -> bool:
 
-   command = restFull[0:1]
-   rest    = restFull[1:]
+   command = line[0:1]
+   rest    = line[1:]
 
    # add a new project
-   if   command == 'a':
-      return _ProcessProjAdd(rest)
+   if   (command == 'a'):
+      return _ProcessProjAdd(rest, id, value)
 
-   elif command == '=':
-      return _ProcessProjSet(rest)
+   elif (command == 'n'):
+      return _ProcessProjName(rest, id, value)
 
-   elif command == 'n':
-      return _ProcessProjName(rest)
+   elif (command == 'd'):
+      return _ProcessProjDesc(rest, id, value)
 
-   elif command == 'd':
-      return _ProcessProjDesc(rest)
+   elif (command == 'v'):
+      return _ProcessProjVis(command, id, value)
 
-   elif command == '-' or
-        command == '+':
-      return _ProcessProjVis(command, rest)
-
-   elif command == '0' or
-        command == '1':
-      return _ProcessProjVisAll(command)
+   elif (command == '0' or
+         command == '1'):
+      return _ProcessProjVisAll(command, id, value)
 
    # Unknow command
    return False
 
-
-def _ProcessProjAdd(line: str) -> bool:
+###############################################################################
+def _ProcessProjAdd(line: str, id: int, value: str) -> bool:
 
    # Create the new project.
-   proj = MytProj.Create(-1, True, str, "")
-   if proj == None:
+   proj = MytProj.Create(-1, True, value, "")
+   if (proj is None):
       return False
 
    # Set the current project to be this new project.
    MytState.SetCurrentProjId(proj.GetId())
 
    # Append the new project to the project list.
-   MytProjList._list.append(proj)
-   # Sort the new project.
-   MytProjList._list.sort()
+   MytProjList.Add(proj)
 
    # Store the new changes.
    MytProjList.FileStore()
@@ -190,74 +199,57 @@ def _ProcessProjAdd(line: str) -> bool:
 
    return True
 
-
-def _ProcessProjName(line: str) -> bool:
+###############################################################################
+def _ProcessProjName(line: str, id: int, value: str) -> bool:
 
    # Find the current project.
-   proj = MytProjList.FindById(MytState.GetCurrentProjId())
-   if proj == None:
+   proj = MytProjList.FindById(id)
+   if (proj is None):
       return False
 
    # Set the project description.
-   proj.SetName(line)
+   proj.SetName(value)
+
+   # Sort the list.
+   MytProjList.Sort()
 
    # Store the new changes.
    MytProjList.FileStore()
 
    return True
 
-
-def _ProcessProjDesc(line: str) -> bool:
+###############################################################################
+def _ProcessProjDesc(line: str, id: int, value: str) -> bool:
 
    # Find the current project.
-   proj = MytProjList.FindById(MytState.GetCurrentProjId())
-   if proj == None:
+   proj = MytProjList.FindById(id)
+   if (proj is None):
       return False
 
    # Set the project description.
-   proj.SetDesc(line)
+   proj.SetDesc(value)
 
    # Store the new changes.
    MytProjList.FileStore()
 
    return True
 
-
-def _ProcessProjSet(line: str) -> bool:
-
-   # Get the id the user wants to set to.
-   id = int(line)
+###############################################################################
+def _ProcessProjVis(command: str, id: int, value: str) -> bool:
 
    # Get the project if there exists a project with that id
    proj = MytProjList.FindById(id)
-   if proj == None:
-      return False
-
-   # Set the project to be the current one.
-   MytState.SetCurrentProjId(id)
-
-   # Save the changes
-   return MytState.FileStore()
-
-
-def _ProcessProjVis(command: str, line: str) -> bool:
-
-   # Get the id the user wants to set to.
-   id = int(line)
-
-   # Get the project if there exists a project with that id
-   proj = MytProjList.FindById(id)
-   if proj == None:
+   if (proj is None):
       return False
 
    # turn on/off the project's visibility
-   proj.SetIsVis(command == '+')
+   proj.SetIsVis(not proj.IsVis())
 
    # Save the changes
    return MytProjList.FileStore()
 
-
-def _ProcessProjVisAll(command: str) -> bool:
+###############################################################################
+def _ProcessProjVisAll(command: str, id: int, value: str) -> bool:
 
    count = MytProjList.GetCount()
 
@@ -276,39 +268,36 @@ def _ProcessProjVisAll(command: str) -> bool:
 ###############################################################################
 # Process the task command
 ###############################################################################
-def _ProcessTask(line: str) -> bool:
+def _ProcessTask(line: str, id: int, value: str) -> bool:
 
-   command = restFull[0:1]
-   rest    = restFull[1:]
+   command = line[0:1]
+   rest    = line[1:]
    
-   if   command == 'a':
-      return _ProcessTaskAdd(rest)
+   if   (command == 'a'):
+      return _ProcessTaskAdd(rest, id, value)
 
-   elif command == '=':
-      return _ProcessTaskSet(rest)
+   elif (command == 'd'):
+      return _ProcessTaskDesc(rest, id, value)
 
-   elif command == 'd':
-      return _ProcessTaskDesc(rest)
+   elif (command == 'P'):
+      return _ProcessTaskProjId(rest, id, value)
 
-   elif command == 'P':
-      return _ProcessTaskProjId(rest)
+   elif (command == 'p' or
+         command == 'e' or
+         command == 's'):
+      return _ProcessTaskAttribute(command, id, value)
 
-   elif command == 'p' or
-        command == 'e' or
-        command == 's':
-      return _ProcessTaskAttribute(command, rest)
-
-   elif command == 'S':
-      return _ProcessTaskState(rest)
+   elif (command == 'S'):
+      return _ProcessTaskState(rest, id, value)
 
    return False
 
-
-def _ProcessTaskAdd(line: str) -> bool:
+###############################################################################
+def _ProcessTaskAdd(line: str, id: int, value: str) -> bool:
 
    # Get the current project
-   proj = MytProjList.FindById(MytState.GetCurrentProjId())
-   if proj == None:
+   proj = MytProjList.FindById(id)
+   if (proj is None):
       return False
 
    # Get the new task.
@@ -318,8 +307,8 @@ def _ProcessTaskAdd(line: str) -> bool:
       MYT_COMMAND.STATE_WORK_TODO, 
       MYT_COMMAND.VAL1,
       MYT_COMMAND.VAL1,
-      line)
-   if task == None:
+      value)
+   if (task is None):
       return False
 
    # Add the task to the task list
@@ -328,51 +317,31 @@ def _ProcessTaskAdd(line: str) -> bool:
    # Store the task list
    return MytTaskList.FileStore()
 
-
-def _ProcessTaskSet(line: str) -> bool:
-
-   # Get the id of the task
-   id = int(str)
-
-   # Find the task if it is there.
-   task = MytTaskList.FindByid(id)
-   if task == None:
-      return False
-
-   # Set the current task id.
-   MytState.SetCurrentTaskId(id)
-
-   # Save the changes
-   return MytState.FileStore()
-
-
-def _ProcessTaskDesc(line: str) -> bool:
+###############################################################################
+def _ProcessTaskDesc(line: str, id: int, value: str) -> bool:
 
    # Get the current task
-   task = MytTaskList.FindById(MytState.GetCurrentTaskId())
-   if task == None:
+   task = MytTaskList.FindById(id)
+   if (task is None):
       return False
 
    # Change the description
-   task.SetDesc(line)
+   task.SetDesc(value)
 
    # Save the changes
    return MytTaskList.FileStore()
 
-
-def _ProcessTaskProjId(line: str) -> bool:
-
-   # what is the id.
-   id = int(line)
+###############################################################################
+def _ProcessTaskProjId(line: str, id: int, value: str) -> bool:
 
    # Get the project if it exits.
-   proj = MytProjList.FindById(id)
-   if proj == None:
+   proj = MytProjList.FindById(int(value))
+   if (proj is None):
       return False
 
    # Get the current task
-   task = MytTaskList.FindById(MytState.GetCurrentTaskId())
-   if task == None:
+   task = MytTaskList.FindById(id)
+   if (task is None):
       return False
 
    # Make the Change
@@ -381,37 +350,37 @@ def _ProcessTaskProjId(line: str) -> bool:
    # Save the changes
    return MytTaskList.FileStore()
 
-
-def _ProcessTaskAttribute(command: str, line: str) -> bool:
+###############################################################################
+def _ProcessTaskAttribute(command: str, id: int, value: str) -> bool:
 
    # Get the current task
-   task = MytTaskList.FindById(MytState.GetCurrentTaskId())
-   if task == None:
+   task = MytTaskList.FindById(id)
+   if (task is None):
       return False
 
    # Make the change
-   if   command == 'p':
-      task.SetPriority(line)
-   elif command == 'e':
-      task.SetEffort(line)
-   elif command == 's':
-      task.SetState(line)
+   if   (command == 'p'):
+      task.SetPriority(value)
+   elif (command == 'e'):
+      task.SetEffort(value)
+   elif (command == 's'):
+      task.SetState(value)
 
    # Save the changes
    return MytTaskList.FileStore()
 
-
-def _ProcessTaskState(line: str) -> bool:
+###############################################################################
+def _ProcessTaskState(line: str, id: int, value: str) -> bool:
 
    # Get the current task
-   task = MytTaskList.FindById(MytState.GetCurrentTaskId())
-   if task == None:
+   task = MytTaskList.FindById(id)
+   if (task is None):
       return False
 
    # Make the change
-   if   line == '-':
+   if   (line == 'p'):
       task.SetState(line)
-   elif line == '+':
+   elif (line == 'n'):
       task.SetState(line)
 
    # Save the changes

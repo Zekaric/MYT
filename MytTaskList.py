@@ -11,9 +11,9 @@
 ###############################################################################
 # import
 ###############################################################################
-import os
+from MytUtil import *
 
-from dataclasses import dataclass
+import os
 
 import MytProj
 import MytProjList
@@ -23,14 +23,12 @@ import MytTask
 # local
 # constant
 ###############################################################################
-@dataclass
 class MYT_TASKLIST:
    FILE: str = 'MYT_tasklist.dat'
 
 ###############################################################################
 # variable
 ###############################################################################
-@dataclass
 class MytTaskList:
    _list = []
 
@@ -51,21 +49,29 @@ def Add(task: MytTask.MytTask):
 def FileLoad() -> bool:
 
    # No project list yet.
-   if not os.path.exists(MYT_TASKLIST.FILE):
+   if (not os.path.exists(MYT_TASKLIST.FILE)):
       return False
 
    # Read in the file.
    fileContent: str
-   with open(MYT_TASKLIST.FILE, 'r') as file:
-      fileContent = file.read()
+   file = open(MYT_TASKLIST.FILE, 'r')
+   fileContent = file.read()
+   file.close()
 
    # For all lines in the file.
-   for line in fileContent:
+   lines       = fileContent.split('\n')
+   fileContent = None
+   for line in lines:
+
+      # Create the task from the line
+      task = MytTask.CreateFromStr(line)
+      if (task is None):
+         continue
 
       # Append the task to the list.
-      MytItemList._list.append(MytTask.CreateFromStr(line))
+      MytTaskList._list.append(task)
 
-   MytItemList._list.sort()
+   MytTaskList._list.sort()
 
    return True
 
@@ -74,36 +80,34 @@ def FileLoad() -> bool:
 ###############################################################################
 def FileStore() -> bool:
 
-   result = False
-
    # Open the file for writing
-   with open(MYT_TASKLIST.FILE, 'w') as file:
+   file = open(MYT_TASKLIST.FILE, 'w')
 
-      # For all projects...
-      for task in MytTaskList._list:
+   # For all projects...
+   for task in MytTaskList._list:
 
-         # Write the project information.
-         file.write(str(task))
+      # Write the project information.
+      file.write(str(task))
 
-      result = True
+   file.close()
 
-   return result
+   return True
 
 ###############################################################################
 # Get the n'th task
 ###############################################################################
 def GetAt(index: int):
    
-   if index < 0 or GetCount() <= index:
+   if (index < 0 or GetCount() <= index):
       return None
 
-   return MytItemList._list[index]
+   return MytTaskList._list[index]
 
 ###############################################################################
 # Get the size of the list.
 ###############################################################################
 def GetCount() -> int:
-   return len(MytItemList._list)
+   return len(MytTaskList._list)
 
 ###############################################################################
 # Start

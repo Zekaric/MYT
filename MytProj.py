@@ -11,6 +11,8 @@
 ###############################################################################
 # import
 ###############################################################################
+from MytUtil import *
+
 import os
 
 ###############################################################################
@@ -31,32 +33,32 @@ class MytProj:
       self._desc  = desc
       self._isVis = isVis
 
-      if id < 0:
+      if (id < 0):
          self._id = MytProj._clsIdMax
          MytProj._clsIdMax += 1
 
       else:
-         if MytProj._clsIdMax < id:
+         if (MytProj._clsIdMax < id):
             MytProj._clsIdMax = id + 1
 
 
    def __eq__(self, other):
-      return self.id == other.id
+      return self._id == other._id
 
    def __ge__(self, other):
-      return self.name >= other.name
+      return self._name >= other._name
 
    def __gt__(self, other):
-      return self.name > other.name
+      return self._name > other._name
 
    def __le__(self, other):
-      return self.name <= other.name
+      return self._name <= other._name
 
    def __lt__(self, other):
-      return self.name < other.name
+      return self._name < other._name
 
    def __ne__(self, other):
-      return self.id != other.id
+      return self._id != other._id
 
    def __str__(self):
       return f'{self._id}\t{self._isVis}\t{self._name}\t{self._desc}\n'
@@ -79,6 +81,9 @@ class MytProj:
    def SetDesc(self, value: str):
       self._desc = value
 
+   def SetIsVis(self, value: bool):
+      self._isVis = value
+
    def SetName(self, value: str):
       self._name = value
 
@@ -90,7 +95,7 @@ class MytProj:
 # Create
 ###############################################################################
 def Create(id: int, isVis: bool, name: str, desc: str = '') -> MytProj:
-   return Project(id, isVis, name, desc)
+   return MytProj(id, isVis, name, desc)
 
 ###############################################################################
 # Create a project from the string.
@@ -101,13 +106,13 @@ def CreateFromStr(line: str) -> MytProj:
    part = line.split('\t')
 
    # Not enought values.
-   if len(part) < 4:
+   if (len(part) < 4):
       return None
 
    # Get the values.
-   id    = int( part[0])
-   isVis = bool(part[1])
-   name  =      part[2]
-   desc  =      part[3]
+   id    = IntFromStr( part[0])
+   isVis = BoolFromStr(part[1])
+   name  =             part[2]
+   desc  =             part[3]
    
    return Create(id, isVis, name, desc)

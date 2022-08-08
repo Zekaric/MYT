@@ -11,24 +11,23 @@
 ###############################################################################
 # import
 ###############################################################################
+from MytUtil import *
+
 import os
 
-from dataclasses import dataclass
-
 import MytProj
+import MytDisplay
 
 ###############################################################################
 # local
 # constant
 ###############################################################################
-@dataclass
 class MYT_PROJLIST:
    FILE: str = 'MYT_projlist.dat'
 
 ###############################################################################
 # variable
 ###############################################################################
-@dataclass 
 class MytProjList:
    # array of MytProj.MytProj
    _list = []
@@ -51,19 +50,27 @@ def Add(proj: MytProj.MytProj):
 def FileLoad() -> bool:
    
    # No project list yet.
-   if not os.path.exists(MYT_PROJLIST.FILE):
+   if (not os.path.exists(MYT_PROJLIST.FILE)):
       return False
 
    # Read in the file.
    fileContent: str
-   with open(MYT_PROJLIST.FILE, 'r') as file:
-      fileContent = file.read()
+   file = open(MYT_PROJLIST.FILE, 'r')
+   fileContent = file.read()
+   file.close()
 
    # For all lines in the file.
-   for line in fileContent:
+   lines       = fileContent.split('\n')
+   fileContent = None
+   for line in lines:
+
+      # Convert the line into a project.
+      proj = MytProj.CreateFromStr(line)
+      if (proj is None):
+         continue
 
       # Append the project to the list.
-      MytProjList._list.append(MytProj.CreateFromStr(line))
+      MytProjList._list.append(proj)
 
    # this should sort the list by name.
    MytProjList._list.sort()
@@ -75,20 +82,18 @@ def FileLoad() -> bool:
 ###############################################################################
 def FileStore() -> bool:
 
-   result = False
-
    # Open the file for writing
-   with open(MYT_PROJLIST.FILE, 'w') as file:
+   file = open(MYT_PROJLIST.FILE, 'w')
    
-      # For all projects...
-      for proj in MytProjList._list:
+   # For all projects...
+   for proj in MytProjList._list:
    
-         # Write the project information.
-         file.write(str(proj))
+      # Write the project information.
+      file.write(str(proj))
 
-      result = True
+   file.close()
 
-   return result
+   return True
 
 ###############################################################################
 # Find a project given a project id.
@@ -99,7 +104,7 @@ def FindById(id: int):
    for proj in MytProjList._list:
 
       # check if the ids match.
-      if id == proj.GetId():
+      if (id == proj.GetId()):
          return proj
 
    return None
@@ -107,9 +112,15 @@ def FindById(id: int):
 ###############################################################################
 # Get the n'th project in the array
 ###############################################################################
+def Get():
+   return MytProjList._list
+
+###############################################################################
+# Get the n'th project in the array
+###############################################################################
 def GetAt(index: int):
    
-   if index < 0 or GetCount() <= index:
+   if (index < 0 or GetCount() <= index):
       return None
 
    return MytProjList._list[index]
@@ -119,6 +130,13 @@ def GetAt(index: int):
 ###############################################################################
 def GetCount() -> int:
    return len(MytProjList._list)
+
+###############################################################################
+# Sort the list
+###############################################################################
+def Sort():
+   
+   MytProjList._list.sort()
 
 ###############################################################################
 # Start the project list routines
