@@ -3,9 +3,9 @@
 # author:     Robbert de Groot
 # company:    Zekaric
 # copyright:  2022, Zekaric
-# 
+#
 # description:
-# 
+#
 ###############################################################################
 
 ###############################################################################
@@ -52,7 +52,7 @@ class MytDisplay:
 # Process the display
 ###############################################################################
 def Process():
-   
+
    print("Content-Type: text/html\n\n")
 
    print("""<!DOCTYPE html>
@@ -157,9 +157,9 @@ def _DisplayProjList():
      <td class="fill">{desc}</td>
     </tr>""".format(
       tr    = _GetTableRow(isAlt),
-      id    = proj.GetId(), 
+      id    = proj.GetId(),
       isVis = isVisValue,
-      name  = nameValue, 
+      name  = nameValue,
       desc  = descValue))
 
       isAlt = not isAlt
@@ -204,7 +204,7 @@ def _DisplayTaskList() -> None:
 
 ###############################################################################
 def _DisplayTaskList_ProjVisList() -> str:
-   
+
    str = """
       <table class="narrow">
        <tbody>
@@ -224,10 +224,10 @@ def _DisplayTaskList_ProjVisList() -> str:
    isAlt     = False;
    projCount = MytProjList.GetCount()
    for index in range(projCount):
-      
+
       proj:    MytProj.MytProj = MytProjList.GetAt(index)
       itemp:   int             = proj.GetId()
-      
+
       isVisValue = _GetLinkCmdId("pv", itemp, _GetBit(StrFromBool(proj.IsVis())))
       nameValue  = proj.GetName()
 
@@ -238,7 +238,7 @@ def _DisplayTaskList_ProjVisList() -> str:
      <td             >{name}</td>
     </tr>""".format(
       tr    = _GetTableRow(isAlt),
-      id    = proj.GetId(), 
+      id    = proj.GetId(),
       isVis = isVisValue,
       name  = nameValue)
 
@@ -311,14 +311,14 @@ def _DisplayTaskList_TaskList() -> str:
    isAlt     = False
    taskCount = MytTaskList.GetCount()
    for index in range(taskCount):
-      
+
       task: MytTask.MytTask = MytTaskList.GetAt(index)
       taskId                = task.GetId()
 
       state = task.GetState()
       if ((state == MytTask.STATE.WORK_TODO  or
-           state == MytTask.STATE.WORK_PROG)    and 
-          not MytState.IsTaskWorkVis()): 
+           state == MytTask.STATE.WORK_PROG)    and
+          not MytState.IsTaskWorkVis()):
          continue
 
       if ((state == MytTask.STATE.TEST_TODO  or
@@ -328,15 +328,15 @@ def _DisplayTaskList_TaskList() -> str:
 
       if ((state == MytTask.STATE.DOC_TODO   or
            state == MytTask.STATE.DOC_PROG)     and
-          not MytState.IsTaskDocVis()):  
+          not MytState.IsTaskDocVis()):
          continue
 
       if ((state == MytTask.STATE.REL_TODO   or
            state == MytTask.STATE.REL_PROG)     and
-          not MytState.IsTaskRelVis()):  
+          not MytState.IsTaskRelVis()):
          continue
 
-      if (state == MytTask.STATE.DONE and not MytState.IsTaskDoneVis()): 
+      if (state == MytTask.STATE.DONE and not MytState.IsTaskDoneVis()):
          continue
 
       proj: MytProj.MytProj = task.GetProj()
@@ -349,7 +349,7 @@ def _DisplayTaskList_TaskList() -> str:
       if (task.GetState() == MytTask.STATE.DONE):
          stateDoneVal = ""
       else:
-         stateDoneVal = _GetButtonCmdIdVal("ts", taskId, "xx", "X")
+         stateDoneVal = _GetButtonCmdIdVal("ts", taskId, "xx", "Done")
 
       projPullDown  = _GetTaskProjPullDown(      taskId, proj)
       statePullDown = _GetTaskTypePullDown("ts", taskId, task.GetState())
@@ -364,7 +364,7 @@ def _DisplayTaskList_TaskList() -> str:
           <td            ><nobr>{statePrev}{stateNext} {state} {stateDone}</nobr></td>
           <td            ><nobr>{pri}</nobr></td>
           <td            ><nobr>{eff}</nobr></td>
-          <td                  >{desc}</td>
+          <td            ><nobr>{desc} {delVal}</nobr></td>
          </tr>
 """.format(
       tr        = _GetTableRowTask(isAlt, task.GetState()),
@@ -377,7 +377,8 @@ def _DisplayTaskList_TaskList() -> str:
       state     = statePullDown,
       pri       = priVal,
       eff       = effVal,
-      desc      = descFld)
+      desc      = descFld,
+      delVal    = _GetButtonCmdId("tx", taskId, "X"))
 
       isAlt = not isAlt
 
@@ -397,7 +398,7 @@ def _DisplayDebug() -> None:
 # Display the form
 ###############################################################################
 def _DisplayDebugForm() -> None:
-   
+
    if (MytDisplay.GetForm() is None):
       return
 
@@ -410,7 +411,7 @@ def _DisplayDebugForm() -> None:
 # Display the command
 ###############################################################################
 def _DisplayDebugCmd() -> None:
-   
+
    print("""
 <h1>Command</h1>
 <p>{cmd}</p>
@@ -440,7 +441,7 @@ def _DisplayDebugEnv() -> None:
 # Convenience function to get a bit image.
 ###############################################################################
 def _GetBit(value: str) -> str:
-   
+
    if   (value == "T"):
       return "<img class=sized src=rankBit1.svg />"
 
@@ -453,19 +454,19 @@ def _GetBit(value: str) -> str:
 # Convenience function for displaying a simple button form.
 ###############################################################################
 def _GetButtonCmd(command: str, content: str) -> str:
-   
+
    return """
 <form style="display:inline-block"><!--
 --><input type="hidden" name="cmd" value="{cmdVal}" /><!--
 --><button type="submit">{conVal}</button></form>""".format(
-      cmdVal = command, 
+      cmdVal = command,
       conVal = content)
 
 ###############################################################################
 # Convenience function for displaying a simple button form.
 ###############################################################################
 def _GetButtonCmdId(command: str, id: int, content: str) -> str:
-   
+
    return """
 <form style="display:inline-block"><!--
 --><input type="hidden" name="cmd" value="{cmdVal}" /><!--
@@ -479,7 +480,7 @@ def _GetButtonCmdId(command: str, id: int, content: str) -> str:
 # Convenience function for displaying a simple button form.
 ###############################################################################
 def _GetButtonCmdIdVal(command: str, id: int, val: str, content: str) -> str:
-   
+
    return """<form style="display:inline-block"><!--
 --><input type="hidden" name="cmd" value="{cmdVal}" /><!--
 --><input type="hidden" name="id"  value="{idVal}" /><!--
@@ -494,7 +495,7 @@ def _GetButtonCmdIdVal(command: str, id: int, val: str, content: str) -> str:
 # Convenience function for displaying a simple button form.
 ###############################################################################
 def _GetLinkCmd(command: str, content: str) -> str:
-   
+
    return """<a href="?cmd={cmdVal}">{conVal}</a>""".format(
       cmdVal = command,
       conVal = content)
@@ -503,7 +504,7 @@ def _GetLinkCmd(command: str, content: str) -> str:
 # Convenience function for displaying a simple button form.
 ###############################################################################
 def _GetLinkCmdId(command: str, id: int, content: str) -> str:
-   
+
    return """<a href="?cmd={cmdVal}&id={idVal}">{conVal}</a>""".format(
       cmdVal = command,
       idVal  = id,
@@ -513,7 +514,7 @@ def _GetLinkCmdId(command: str, id: int, content: str) -> str:
 # Convenience function for displaying a simple button form.
 ###############################################################################
 def _GetLinkCmdIdVal(command: str, id: int, val: str, content: str) -> str:
-   
+
    return """<a href="?cmd={cmdVal}&id={idVal}&val={valVal}">{conVal}</a>""".format(
       cmdVal = command,
       idVal  = id,
@@ -539,7 +540,7 @@ def _GetDotGraph(command: str, id: int, val: str, isImaginary: bool) -> str:
          _GetLinkCmdIdVal(command, id, MytTask.EFF.VAL3, _GetBit("I")) +
          _GetLinkCmdIdVal(command, id, MytTask.EFF.VAL4, _GetBit("I")) +
          _GetLinkCmdIdVal(command, id, MytTask.EFF.VAL5, _GetBit("I")) +
-         " " + 
+         " " +
          _GetLinkCmdIdVal(command, id, MytTask.EFF.VALI, _GetBit(StrFromBool(True))))
 
    str  = (
@@ -558,7 +559,7 @@ def _GetDotGraph(command: str, id: int, val: str, isImaginary: bool) -> str:
 # Convenience function for displaying a simple input form
 ###############################################################################
 def _GetInputCmdVal(command: str, value: str, size: int) -> str:
-   
+
    return """
 <form style="display:inline-block"><!--
 --><input type="hidden" name="cmd" value="{cmdVal}" /><!--
@@ -572,7 +573,7 @@ def _GetInputCmdVal(command: str, value: str, size: int) -> str:
 # Convenience function for displaying a simple input form
 ###############################################################################
 def _GetInputCmdIdVal(command: str, id: int, value: str, size: int) -> str:
-   
+
    return """
 <form style="display:inline-block"><!--
 --><input type="hidden" name="cmd" value="{cmdVal}" /><!--
@@ -662,7 +663,7 @@ def _GetCurrProjPullDown() -> str:
 
    # build the options
    projCount  = MytProjList.GetCount()
-   currProjId = MytState.GetCurrProjId()
+   currProjId = MytState.GetCurrIdProj()
 
    for index in range(projCount):
 
@@ -712,7 +713,7 @@ def _GetTaskProjPullDown(id: int, proj: MytProj.MytProj) -> str:
 # Convenience function for displaying a simple input form
 ###############################################################################
 def _GetTableRow(isAlt: bool) -> str:
-   
+
    if (isAlt):
       return """<tr class="rowAlt">
 """
@@ -723,7 +724,7 @@ def _GetTableRow(isAlt: bool) -> str:
 # Convenience function for displaying a simple input form
 ###############################################################################
 def _GetTableRowTask(isAlt: bool, state: str) -> str:
-   
+
    if (isAlt):
       if (state == "wt"):   return '<tr class="rowStyle1Alt">'
       if (state == "wp"):   return '<tr class="rowStyle2Alt">'
@@ -733,9 +734,9 @@ def _GetTableRowTask(isAlt: bool, state: str) -> str:
       if (state == "dp"):   return '<tr class="rowStyle6Alt">'
       if (state == "rt"):   return '<tr class="rowStyle7Alt">'
       if (state == "rp"):   return '<tr class="rowStyle8Alt">'
-      
+
       return '<tr class="rowStyle9Alt">'
-   
+
    if (state == "wt"):   return '<tr class="rowStyle1">'
    if (state == "wp"):   return '<tr class="rowStyle2">'
    if (state == "tt"):   return '<tr class="rowStyle3">'
@@ -744,5 +745,5 @@ def _GetTableRowTask(isAlt: bool, state: str) -> str:
    if (state == "dp"):   return '<tr class="rowStyle6">'
    if (state == "rt"):   return '<tr class="rowStyle7">'
    if (state == "rp"):   return '<tr class="rowStyle8">'
-   
+
    return '<tr class="rowStyle9">'

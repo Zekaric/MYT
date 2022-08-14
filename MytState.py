@@ -3,7 +3,7 @@
 # author:     Robbert de Groot
 # company:    [company]
 # copyright:  2022, Robbert de Groot
-# 
+#
 # description:
 # Program state information
 ###############################################################################
@@ -21,147 +21,234 @@ import os
 ###############################################################################
 class MYT_STATE:
    FILE                 : str = 'MYT_state.dat'
-   CURR_PROJ_ID         : str = 'currProjId'
-   IS_SHOWING_PROJ_LIST : str = 'isShowingProjList'
-   IS_SHOWING_TASK_WORK : str = 'isShowingTaskWork'
-   IS_SHOWING_TASK_TEST : str = 'isShowingTaskTest'
-   IS_SHOWING_TASK_DOC  : str = 'isShowingTaskDoc'
-   IS_SHOWING_TASK_REL  : str = 'isShowingTaskRel'
-   IS_SHOWING_TASK_DONE : str = 'isShowingTaskDone'
+   CURR_ID_PROJ         : str = 'currIdProj'
+   NEXT_ID_PROJ         : str = 'nextIdProj'
+   NEXT_ID_TASK         : str = 'nextIdTask'
+   IS_PROJ_LIST_VIS     : str = 'isProjListVis'
+   IS_TASK_WORK_VIS     : str = 'isTaskWorkVis'
+   IS_TASK_TEST_VIS     : str = 'isTaskTestVis'
+   IS_TASK_DOC_VIS      : str = 'isTaskDocVis'
+   IS_TASK_REL_VIS      : str = 'isTaskRelVis'
+   IS_TASK_DONE_VIS     : str = 'isTaskDoneVis'
 
 ###############################################################################
 # variable
 ###############################################################################
 class MytState:
-   _currProjId          : int  = 0
-   _currProjIndex       : int  = 0
+   _currIdProj          : int  = 0
+   _nextIdProj          : int  = 1
+   _nextIdTask          : int  = 1
    _isProjListVis       : bool = False
    _isTaskWorkVis       : bool = True
    _isTaskTestVis       : bool = True
    _isTaskDocVis        : bool = True
    _isTaskRelVis        : bool = True
    _isTaskDoneVis       : bool = True
-   
-   @classmethod
-   def GetCurrProjId(   cls)              -> int:  return cls._currProjId
 
    @classmethod
-   def GetCurrProjIndex(cls)              -> int:  return cls._currProjIndex
+   def GetCurrIdProj(cls) -> int:
+      return cls._currIdProj
 
    @classmethod
-   def IsProjListVis(   cls)              -> bool: return cls._isProjListVis
+   def GetNextIdProj(cls) -> int:
+      id = cls._nextIdProj
+      cls._nextIdProj = cls._nextIdProj + 1
+      cls.FileStore()
+      return id
 
    @classmethod
-   def IsTaskWorkVis(   cls)              -> bool: return cls._isTaskWorkVis
+   def GetNextIdTask(cls) -> int:
+      id = cls._nextIdTask
+      cls._nextIdTask = cls._nextIdTask + 1
+      cls.FileStore()
+      return id
+
 
    @classmethod
-   def IsTaskTestVis(   cls)              -> bool: return cls._isTaskTestVis
+   def IsProjListVis(cls) -> bool:
+      return cls._isProjListVis
 
    @classmethod
-   def IsTaskDocVis(    cls)              -> bool: return cls._isTaskDocVis
+   def IsTaskWorkVis(cls) -> bool:
+      return cls._isTaskWorkVis
 
    @classmethod
-   def IsTaskRelVis(    cls)              -> bool: return cls._isTaskRelVis
+   def IsTaskTestVis(cls) -> bool:
+      return cls._isTaskTestVis
 
    @classmethod
-   def IsTaskDoneVis(   cls)              -> bool: return cls._isTaskDoneVis
+   def IsTaskDocVis(cls) -> bool:
+      return cls._isTaskDocVis
 
    @classmethod
-   def SetCurrProjId(   cls, value: int)  -> None: cls._currProjId    = value
+   def IsTaskRelVis(cls) -> bool:
+      return cls._isTaskRelVis
 
    @classmethod
-   def SetCurrProjIndex(cls, value: int)  -> None: cls._currProjIndex = value
+   def IsTaskDoneVis(cls) -> bool:
+      return cls._isTaskDoneVis
+
 
    @classmethod
-   def SetIsProjListVis(cls, value: bool) -> None: cls._isProjListVis = value
+   def SetCurrIdProj(cls, value: int)  -> None:
+      cls._currIdProj = value
+      cls.FileStore()
 
    @classmethod
-   def SetIsTaskWorkVis(cls, value: bool) -> None: cls._isTaskWorkVis = value
+   def SetNextIdProj(   cls, value: int)  -> None:
+      # Ensure we have the highest values.
+      if (value >= cls._nextIdProj):
+         cls._nextIdProj = value + 1
+         cls.FileStore()
 
    @classmethod
-   def SetIsTaskTestVis(cls, value: bool) -> None: cls._isTaskTestVis = value
+   def SetNextIdTask(   cls, value: int)  -> None:
+      # Ensure we have the highest values.
+      if (value >= cls._nextIdTask):
+         cls._nextIdTask = value + 1
+         cls.FileStore()
 
    @classmethod
-   def SetIsTaskDocVis( cls, value: bool) -> None: cls._isTaskDocVis  = value
+   def SetCurrProjIndex(cls, value: int) -> None:
+      cls._currProjIndex = value
+      cls.FileStore()
 
    @classmethod
-   def SetIsTaskRelVis( cls, value: bool) -> None: cls._isTaskRelVis  = value
+   def SetIsProjListVis(cls, value: bool) -> None:
+      cls._isProjListVis = value
+      cls.FileStore()
 
    @classmethod
-   def SetIsTaskDoneVis(cls, value: bool) -> None: cls._isTaskDoneVis = value
+   def SetIsTaskWorkVis(cls, value: bool) -> None:
+      cls._isTaskWorkVis = value
+      cls.FileStore()
+
+   @classmethod
+   def SetIsTaskTestVis(cls, value: bool) -> None:
+      cls._isTaskTestVis = value
+      cls.FileStore()
+
+   @classmethod
+   def SetIsTaskDocVis( cls, value: bool) -> None:
+      cls._isTaskDocVis  = value
+      cls.FileStore()
+
+   @classmethod
+   def SetIsTaskRelVis( cls, value: bool) -> None:
+      cls._isTaskRelVis  = value
+      cls.FileStore()
+
+   @classmethod
+   def SetIsTaskDoneVis(cls, value: bool) -> None:
+      cls._isTaskDoneVis = value
+      cls.FileStore()
+
+   @classmethod
+   def FileLoad(cls)                      -> bool:
+      # No project list yet.
+      if (not os.path.exists(MYT_STATE.FILE)):
+         return cls.FileStore()
+
+      # Read in the file.
+      try:
+         file = open(MYT_STATE.FILE, 'r')
+      except IOError:
+         return False
+
+      fileContent = file.read()
+      file.close();
+
+      # For all lines in the file.
+      lines       = fileContent.split('\n')
+      fileContent = None
+      for line in lines:
+         # Split the line
+         part = line.split('\t')
+
+         if   (part[0] == MYT_STATE.CURR_ID_PROJ):
+            cls._currIdProj = IntFromStr(part[1])
+
+         elif (part[0] == MYT_STATE.NEXT_ID_PROJ):
+            cls._nextIdProj = IntFromStr(part[1])
+
+         elif (part[0] == MYT_STATE.NEXT_ID_TASK):
+            cls._nextIdTask = IntFromStr(part[1])
+
+         elif (part[0] == MYT_STATE.IS_PROJ_LIST_VIS):
+            cls._isProjListVis = BoolFromStr(part[1])
+
+         elif (part[0] == MYT_STATE.IS_TASK_WORK_VIS):
+            cls._isTaskWorkVis = BoolFromStr(part[1])
+
+         elif (part[0] == MYT_STATE.IS_TASK_TEST_VIS):
+            cls._isTaskTestVis = BoolFromStr(part[1])
+
+         elif (part[0] == MYT_STATE.IS_TASK_DOC_VIS):
+            cls._isTaskDocVis = BoolFromStr(part[1])
+
+         elif (part[0] == MYT_STATE.IS_TASK_REL_VIS):
+            cls._isTaskRelVis = BoolFromStr(part[1])
+
+         elif (part[0] == MYT_STATE.IS_TASK_DONE_VIS):
+            cls._isTaskDoneVis = BoolFromStr(part[1])
+
+      return True
+
+   @classmethod
+   def FileStore(cls) -> bool:
+
+      try:
+         file = open(MYT_STATE.FILE, 'w')
+      except IOError:
+         return False
+
+      file.write(MYT_STATE.CURR_ID_PROJ     + '\t' + StrFromInt( cls._currIdProj)    + '\n')
+      file.write(MYT_STATE.NEXT_ID_PROJ     + '\t' + StrFromInt( cls._nextIdProj)    + '\n')
+      file.write(MYT_STATE.NEXT_ID_TASK     + '\t' + StrFromInt( cls._nextIdTask)    + '\n')
+      file.write(MYT_STATE.IS_PROJ_LIST_VIS + '\t' + StrFromBool(cls._isProjListVis) + '\n')
+      file.write(MYT_STATE.IS_TASK_WORK_VIS + '\t' + StrFromBool(cls._isTaskWorkVis) + '\n')
+      file.write(MYT_STATE.IS_TASK_TEST_VIS + '\t' + StrFromBool(cls._isTaskTestVis) + '\n')
+      file.write(MYT_STATE.IS_TASK_DOC_VIS  + '\t' + StrFromBool(cls._isTaskDocVis)  + '\n')
+      file.write(MYT_STATE.IS_TASK_REL_VIS  + '\t' + StrFromBool(cls._isTaskRelVis)  + '\n')
+      file.write(MYT_STATE.IS_TASK_DONE_VIS + '\t' + StrFromBool(cls._isTaskDoneVis) + '\n')
+
+      file.close()
+
+      return True
 
 ###############################################################################
-# global 
+# global
 # function
 ###############################################################################
 ###############################################################################
 # Load in the data.
 ###############################################################################
 def FileLoad() -> bool:
-      
-   # No project list yet.
-   if (not os.path.exists(MYT_STATE.FILE)):
-      return FileStore()
-
-   # Read in the file.
-   file = open(MYT_STATE.FILE, 'r')
-   fileContent = file.read()
-   file.close();
-
-   # For all lines in the file.
-   lines       = fileContent.split('\n')
-   fileContent = None
-   for line in lines:
-      # Split the line
-      part = line.split('\t')
-
-      if   (part[0] == MYT_STATE.CURR_PROJ_ID):
-         MytState.SetCurrProjId(IntFromStr(part[1]))
-
-      elif (part[0] == MYT_STATE.IS_SHOWING_PROJ_LIST):
-         MytState.SetIsProjListVis(BoolFromStr(part[1]))
-
-      elif (part[0] == MYT_STATE.IS_SHOWING_TASK_WORK):
-         MytState.SetIsTaskWorkVis(BoolFromStr(part[1]))
-
-      elif (part[0] == MYT_STATE.IS_SHOWING_TASK_TEST):
-         MytState.SetIsTaskTestVis(BoolFromStr(part[1]))
-
-      elif (part[0] == MYT_STATE.IS_SHOWING_TASK_DOC):
-         MytState.SetIsTaskDocVis(BoolFromStr(part[1]))
-
-      elif (part[0] == MYT_STATE.IS_SHOWING_TASK_REL):
-         MytState.SetIsTaskRelVis(BoolFromStr(part[1]))
-
-      elif (part[0] == MYT_STATE.IS_SHOWING_TASK_DONE):
-         MytState.SetIsTaskDoneVis(BoolFromStr(part[1]))
-   
-   return True
+   return MytState.FileLoad()
 
 ###############################################################################
 # Store the state data
 ###############################################################################
 def FileStore() -> bool:
-   
-   file = open(MYT_STATE.FILE, 'w')
+   return MytState.FileStore()
 
-   file.write(MYT_STATE.CURR_PROJ_ID         + '\t' + StrFromInt( MytState.GetCurrProjId()) + '\n')
-   file.write(MYT_STATE.IS_SHOWING_PROJ_LIST + '\t' + StrFromBool(MytState.IsProjListVis()) + '\n')
-   file.write(MYT_STATE.IS_SHOWING_TASK_WORK + '\t' + StrFromBool(MytState.IsTaskWorkVis()) + '\n')
-   file.write(MYT_STATE.IS_SHOWING_TASK_TEST + '\t' + StrFromBool(MytState.IsTaskTestVis()) + '\n')
-   file.write(MYT_STATE.IS_SHOWING_TASK_DOC  + '\t' + StrFromBool(MytState.IsTaskDocVis())  + '\n')
-   file.write(MYT_STATE.IS_SHOWING_TASK_REL  + '\t' + StrFromBool(MytState.IsTaskRelVis())  + '\n')
-   file.write(MYT_STATE.IS_SHOWING_TASK_DONE + '\t' + StrFromBool(MytState.IsTaskDoneVis()) + '\n')
-
-   file.close()
-
-   return True
-   
 ###############################################################################
 # get the current project id
 ###############################################################################
-def GetCurrProjId() -> int:
-   return MytState.GetCurrProjId()
+def GetCurrIdProj() -> int:
+   return MytState.GetCurrIdProj()
+
+###############################################################################
+# get the next project id
+###############################################################################
+def GetNextIdProj() -> int:
+   return MytState.GetNextIdProj()
+
+###############################################################################
+# get the next task id
+###############################################################################
+def GetNextIdTask() -> int:
+   return MytState.GetNextIdTask()
 
 ###############################################################################
 # is the display showing the project list
@@ -200,6 +287,24 @@ def IsTaskWorkVis() -> bool:
    return MytState.IsTaskWorkVis()
 
 ###############################################################################
+# set the current proj id
+###############################################################################
+def SetCurrIdProj(value: int) -> None:
+   MytState.SetCurrIdProj(value)
+
+###############################################################################
+# set the next proj id
+###############################################################################
+def SetNextIdProj(value: int) -> None:
+   MytState.SetNextIdProj(value)
+
+###############################################################################
+# set the next task id
+###############################################################################
+def SetNextIdTask(value: int) -> None:
+   MytState.SetNextIdTask(value)
+
+###############################################################################
 # set the display to show the project list
 ###############################################################################
 def SetIsProjListVis(value: bool) -> None:
@@ -234,12 +339,6 @@ def SetIsTaskTestVis(value: bool) -> None:
 ###############################################################################
 def SetIsTaskWorkVis(value: bool) -> None:
    MytState.SetIsTaskWorkVis(value)
-
-###############################################################################
-# set the current proj id
-###############################################################################
-def SetCurrProjId(value: int) -> None:
-   MytState.SetCurrProjId(value)
 
 ###############################################################################
 # Start up the status routines.

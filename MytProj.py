@@ -3,7 +3,7 @@
 # author:     Robbert de Groot
 # company:    Zekaric
 # copyright:  2022, Zekaric
-# 
+#
 # description:
 # Project handling.
 ###############################################################################
@@ -13,6 +13,8 @@
 ###############################################################################
 from MytUtil import *
 
+import MytState
+
 ###############################################################################
 # global
 # class
@@ -21,24 +23,18 @@ from MytUtil import *
 # Project Class
 ###############################################################################
 class MytProj:
-   
-   _clsIdMax: int = 0
 
    def __init__(self, id: int = 0, isVis: bool = True, name: str = "", desc: str = ""):
-      
+
       self._id:      int   = id;
       self._name:    str   = name
       self._desc:    str   = desc
       self._isVis:   bool  = isVis
 
       if (id < 0):
-         self._id = MytProj._clsIdMax
-
-         MytProj._clsIdMax += 1
-
+         self._id = MytState.GetNextIdProj()
       else:
-         if (MytProj._clsIdMax < id):
-            MytProj._clsIdMax = id + 1
+         MytState.SetNextIdProj(id)
 
 
    def __eq__(self, other: object) -> bool:
@@ -116,7 +112,7 @@ def Create(id: int = 0, isVis: bool = True, name: str = "", desc: str = "") -> M
 # Create a project from the string.
 ###############################################################################
 def CreateFromStr(line: str) -> MytProj | None:
-   
+
    # Split the line
    part = line.split('\t')
 
@@ -129,5 +125,5 @@ def CreateFromStr(line: str) -> MytProj | None:
    isVis = BoolFromStr(part[1])
    name  =             part[2]
    desc  =             part[3]
-   
+
    return Create(id, isVis, name, desc)

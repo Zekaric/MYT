@@ -3,7 +3,7 @@
 # author:     Robbert de Groot
 # company:    Zekaric
 # copyright:  2022, Zekaric
-# 
+#
 # description:
 # Item handling
 ###############################################################################
@@ -13,6 +13,7 @@
 ###############################################################################
 from MytUtil import *
 
+import MytState
 import MytProj
 import MytProjList
 
@@ -49,7 +50,7 @@ class STATE:
    REL_PROG:  str = "rp"
    DONE:      str = "xx"
 
-   _list: list[str] = [ 
+   _list: list[str] = [
       WORK_TODO,
       WORK_PROG,
       TEST_TODO,
@@ -107,8 +108,6 @@ class STATE:
 ###############################################################################
 class MytTask:
 
-   _clsIdMax: int = 0
-
    def __init__(self, id: int, projId: int, state: str, priority: str, effort: str, desc: str):
       self._id:         int               = id
       self._projId:     int               = projId
@@ -119,12 +118,9 @@ class MytTask:
       self._desc:       str               = desc
 
       if (id < 0):
-         self._id = MytTask._clsIdMax
-         MytTask._clsIdMax += 1
-
+         self._id = MytState.GetNextIdTask()
       else:
-         if (MytTask._clsIdMax < id):
-            MytTask._clsIdMax = id + 1
+         MytState.SetNextIdTask(id)
 
       # for convenience get the project name.
       proj = MytProjList.FindById(projId)
@@ -139,7 +135,7 @@ class MytTask:
 
    def __ge__(self, other: object) -> bool:
       if isinstance(other, MytTask):
-         
+
          return not (self < other)
 
       return NotImplemented
@@ -164,7 +160,7 @@ class MytTask:
             return self._priority > other._priority
          if (self._effort != other._effort):
             return self._effort > other._effort
-         
+
          return self._id <= other._id
 
       return NotImplemented
@@ -182,7 +178,7 @@ class MytTask:
             return self._priority >= other._priority
          if (self._effort != other._effort):
             return self._effort >= other._effort
-         
+
          return self._id < other._id
 
       return NotImplemented

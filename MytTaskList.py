@@ -3,7 +3,7 @@
 # author:     Robbert de Groot
 # company:    Zekaric
 # copyright:  2022, Zekaric
-# 
+#
 # description:
 # Task list handling
 ###############################################################################
@@ -103,14 +103,28 @@ class MytTaskList:
 
    @classmethod
    def FindById(cls, id: int) -> MytTask.MytTask | None:
-      
+
       # For all tasks...
       for task in cls._list:
 
          if (task.GetId() == id):
             return task
-      
+
       return None
+
+   @classmethod
+   def RemoveById(cls, id: int) -> None:
+
+      index: int = -1
+      count: int = len(cls._list)
+      for index in range(count):
+
+         task = cls._list[index]
+         if (task.GetId() == id):
+            break
+
+      if (0 <= index and index < count):
+         del cls._list[index]
 
 ###############################################################################
 # global
@@ -154,7 +168,13 @@ def GetCount() -> int:
    return MytTaskList.GetCount()
 
 ###############################################################################
-# Start
+# Remove a task
+###############################################################################
+def RemoveById(id: int) -> None:
+   MytTaskList.RemoveById(id)
+
+###############################################################################
+# Sort
 ###############################################################################
 def Sort() -> None:
    MytTaskList.Sort()
