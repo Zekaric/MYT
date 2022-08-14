@@ -9,10 +9,6 @@
 ###############################################################################
 
 ###############################################################################
-# import
-###############################################################################
-
-###############################################################################
 # global
 # function
 ###############################################################################
@@ -25,9 +21,7 @@ def StrFromInt(value: int) -> str:
 # Python fucked up here.  Above we have int conversion.  Looks sane.  You'd 
 # expect bool(str) to work the same.  NO IT DOESN'T.  That's fucked up.
 def BoolFromStr(value: str) -> bool:
-   # "True" for backwards compatibility
-   # "1" for alternative
-   return value == "T" or value == "True" or value == "1"
+   return value == "T"
 
 def StrFromBool(value: bool) -> str:
    if (value):

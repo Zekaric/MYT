@@ -13,8 +13,6 @@
 ###############################################################################
 from MytUtil import *
 
-import os
-
 ###############################################################################
 # global
 # class
@@ -26,15 +24,16 @@ class MytProj:
    
    _clsIdMax: int = 0
 
-   def __init__(self, id: int, isVis: bool, name: str, desc: str):
+   def __init__(self, id: int = 0, isVis: bool = False, name: str = "", desc: str = ""):
       
-      self._id    = id;
-      self._name  = name
-      self._desc  = desc
-      self._isVis = isVis
+      self._id:      int   = id;
+      self._name:    str   = name
+      self._desc:    str   = desc
+      self._isVis:   bool  = isVis
 
       if (id < 0):
          self._id = MytProj._clsIdMax
+
          MytProj._clsIdMax += 1
 
       else:
@@ -42,26 +41,42 @@ class MytProj:
             MytProj._clsIdMax = id + 1
 
 
-   def __eq__(self, other):
-      return self._id == other._id
+   def __eq__(self, other: object) -> bool:
+      if (isinstance(other, MytProj)):
+         return self._id == other._id
+      return NotImplemented
 
-   def __ge__(self, other):
-      return self._name >= other._name
+   def __ge__(self, other: object) -> bool:
+      if (isinstance(other, MytProj)):
+         return self._name >= other._name
+      return NotImplemented
 
-   def __gt__(self, other):
-      return self._name > other._name
+   def __gt__(self, other: object) -> bool:
+      if (isinstance(other, MytProj)):
+         return self._name > other._name
+      return NotImplemented
 
-   def __le__(self, other):
-      return self._name <= other._name
+   def __le__(self, other: object) -> bool:
+      if (isinstance(other, MytProj)):
+         return self._name <= other._name
+      return NotImplemented
 
-   def __lt__(self, other):
-      return self._name < other._name
+   def __lt__(self, other: object) -> bool:
+      if (isinstance(other, MytProj)):
+         return self._name < other._name
+      return NotImplemented
 
-   def __ne__(self, other):
-      return self._id != other._id
+   def __ne__(self, other: object) -> bool:
+      if (isinstance(other, MytProj)):
+         return self._id != other._id
+      return NotImplemented
 
    def __str__(self):
-      return f'{self._id}\t{self._isVis}\t{self._name}\t{self._desc}\n'
+      return "{id}\t{isVis}\t{name}\t{desc}\n".format(
+         id    = StrFromInt( self._id),
+         isVis = StrFromBool(self._isVis),
+         name  =             self._name,
+         desc  =             self._desc)
 
 
    def GetDesc(self) -> str:
@@ -94,13 +109,13 @@ class MytProj:
 ###############################################################################
 # Create
 ###############################################################################
-def Create(id: int, isVis: bool, name: str, desc: str = '') -> MytProj:
+def Create(id: int = 0, isVis: bool = False, name: str = "", desc: str = "") -> MytProj:
    return MytProj(id, isVis, name, desc)
 
 ###############################################################################
 # Create a project from the string.
 ###############################################################################
-def CreateFromStr(line: str) -> MytProj:
+def CreateFromStr(line: str) -> MytProj | None:
    
    # Split the line
    part = line.split('\t')

@@ -173,6 +173,14 @@ h1
 
 img.sized 
 {
-   height:              0.7rem;
+   height:              0.75rem;
    width:               auto;
+}
+
+input {
+/*   background-color:    transparent;*/
+}
+
+select {
+   background-color:    transparent;
 }
