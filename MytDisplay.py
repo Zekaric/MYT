@@ -11,7 +11,6 @@
 ###############################################################################
 # imports:
 ###############################################################################
-from inspect import ismemberdescriptor
 from MytUtil import *
 
 import os
@@ -210,12 +209,11 @@ def _DisplayTaskList_ProjVisList() -> str:
       <table class="narrow">
        <tbody>
         <tr>
-         <td colspan=4>
+         <td colspan=4><nobr>
           {hideAllBtn}
           {showAllBtn}
-         </td>
+         </nobr></td>
         </tr><tr>
-         <th             ><nobr>X</nobr></th>
          <th             ><nobr>Vis</nobr></th>
          <!--<th             ><nobr>PID</nobr></th>-->
          <th             ><nobr>Project</nobr></th>
@@ -227,23 +225,20 @@ def _DisplayTaskList_ProjVisList() -> str:
    projCount = MytProjList.GetCount()
    for index in range(projCount):
       
-      proj: MytProj.MytProj = MytProjList.GetAt(index)
-
-      itemp = proj.GetId()
-
+      proj:    MytProj.MytProj = MytProjList.GetAt(index)
+      itemp:   int             = proj.GetId()
+      
       isVisValue = _GetLinkCmdId("pv", itemp, _GetBit(StrFromBool(proj.IsVis())))
       nameValue  = proj.GetName()
 
       str = str + """
     {tr}
-     <td class="bool">{isCur}</td>
      <td class="bool">{isVis}</td>
      <!--<td class="num" >{id}</td>-->
      <td             >{name}</td>
     </tr>""".format(
       tr    = _GetTableRow(isAlt),
       id    = proj.GetId(), 
-      isCur = _GetLinkCmdId("pc", itemp, _GetBit(StrFromBool(itemp == MytState.GetCurrProjId()))),
       isVis = isVisValue,
       name  = nameValue)
 
@@ -285,12 +280,19 @@ def _DisplayTaskList_StateVisList() -> str:
 
 ###############################################################################
 def _DisplayTaskList_TaskList() -> str:
+
+   newTaskPrjVal = ""
+   newTaskFldVal = ""
+   if (MytProjList.GetCount() != 0):
+      newTaskPrjVal = _GetCurrProjPullDown()
+      newTaskFldVal = _GetInputCmdVal("ta", "New Task", 100)
+
    str = """
       <table class="wide">
        <tbody>
         <tr>
          <td colspan=7>
-          {newTaskFld}
+          {newTaskPrj} {newTaskFld}
          </td>
         </tr>
         <tr>
@@ -303,7 +305,8 @@ def _DisplayTaskList_TaskList() -> str:
           <th class="fill">Description</th>
         </tr>
 """.format(
-      newTaskFld  = _GetInputCmdVal("ta", "New Task", 100))
+      newTaskPrj = newTaskPrjVal,
+      newTaskFld = newTaskFldVal)
 
    isAlt     = False
    taskCount = MytTaskList.GetCount()
@@ -646,6 +649,33 @@ def _GetTaskTypePullDown(command: str, id: int, value: str) -> str:
    str = str + """<option value="{codeVal}" {selVal}>Done</option>""".format(
       codeVal = MytTask.STATE.DONE,
       selVal  = isSel)
+
+   return str + """</select><input type="submit" hidden /></form>"""
+
+###############################################################################
+# Convenience function for displaying a simple input form
+###############################################################################
+def _GetCurrProjPullDown() -> str:
+   str = """<form style="display:inline-block"><!--
+--><input type="hidden" name="cmd" value="pc" /><!--
+--><select name="id" onchange="this.form.submit()">"""
+
+   # build the options
+   projCount  = MytProjList.GetCount()
+   currProjId = MytState.GetCurrProjId()
+
+   for index in range(projCount):
+
+      proj = MytProjList.GetAt(index)
+
+      isSel = ""
+      if proj.GetId() == currProjId:
+         isSel = "selected"
+
+      str = str + """<option value="{projIdVal}" {selVal}>{projNameVal}</option>""".format(
+         projIdVal   = proj.GetId(),
+         selVal      = isSel,
+         projNameVal = proj.GetName())
 
    return str + """</select><input type="submit" hidden /></form>"""
 

@@ -97,9 +97,9 @@ def Process(form: cgi.FieldStorage) -> bool:
    id      = 0
    value   = ""
    if (False):
-      command = "tp"
-      id      = 44
-      value   = "5"
+      command = "ta"
+      id      = 0
+      value   = "New task"
 
    if (COMMAND.CMD in form):
       command = form.getvalue(COMMAND.CMD)
@@ -154,7 +154,6 @@ def _ProcessList(line: str, id: int, value: str) -> bool:
 def _ProcessProj(line: str, id: int, value: str) -> bool:
 
    command = line[0:1]
-   rest    = line[1:]
 
    # add a new project
    if (command == COMMAND.PROJ_ADD):
@@ -185,7 +184,9 @@ def _ProcessProj(line: str, id: int, value: str) -> bool:
 def _ProcessProjAdd(value: str) -> bool:
 
    # Create the new project.
-   proj = MytProj.Create()
+   proj = MytProj.Create(-1, True, value)
+   if (proj is None):
+      return False
 
    # Set the current project to be this new project.
    MytState.SetCurrProjId(proj.GetId())
@@ -217,6 +218,22 @@ def _ProcessProjName(id: int, value: str) -> bool:
 
    # Store the new changes.
    MytProjList.FileStore()
+
+   return True
+
+###############################################################################
+def _ProcessProjCurr(id: int) -> bool:
+
+   # Find the project.
+   proj = MytProjList.FindById(id)
+   if (proj is None):
+      return False
+
+   # Set the current project.
+   MytState.SetCurrProjId(id)
+
+   # Store the changes.
+   MytState.FileStore();
 
    return True
 
@@ -273,7 +290,6 @@ def _ProcessProjVisAll(vis: bool) -> bool:
 def _ProcessTask(line: str, id: int, value: str) -> bool:
 
    command = line[0:1]
-   rest    = line[1:]
    
    if   (command == COMMAND.TASK_ADD):
       return _ProcessTaskAdd(value)
@@ -314,7 +330,10 @@ def _ProcessTaskAdd(value: str) -> bool:
    MytTaskList.Add(task)
 
    # Store the task list
-   return MytTaskList.FileStore()
+   if (not MytTaskList.FileStore()):
+      return False
+
+   return True
 
 ###############################################################################
 def _ProcessTaskDesc(id: int, value: str) -> bool:
@@ -375,23 +394,6 @@ def _ProcessTaskAttribute(command: str, id: int, value: str) -> bool:
          task.SetState(value)
 
    MytTaskList.Sort()
-
-   # Save the changes
-   return MytTaskList.FileStore()
-
-###############################################################################
-def _ProcessTaskState(line: str, id: int, value: str) -> bool:
-
-   # Get the current task
-   task = MytTaskList.FindById(id)
-   if (task is None):
-      return False
-
-   # Make the change
-   if   (line == 'p'):
-      task.SetState(line)
-   elif (line == 'n'):
-      task.SetState(line)
 
    # Save the changes
    return MytTaskList.FileStore()

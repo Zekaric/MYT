@@ -21,7 +21,6 @@ import os
 ###############################################################################
 class MYT_STATE:
    FILE                 : str = 'MYT_state.dat'
-   CURR_TASK_ID         : str = 'currTaskId'
    CURR_PROJ_ID         : str = 'currProjId'
    IS_SHOWING_PROJ_LIST : str = 'isShowingProjList'
    IS_SHOWING_TASK_WORK : str = 'isShowingTaskWork'
@@ -36,8 +35,6 @@ class MYT_STATE:
 class MytState:
    _currProjId          : int  = 0
    _currProjIndex       : int  = 0
-   _currTaskId          : int  = 0
-   _currTaskIndex       : int  = 0
    _isProjListVis       : bool = False
    _isTaskWorkVis       : bool = True
    _isTaskTestVis       : bool = True
@@ -50,12 +47,6 @@ class MytState:
 
    @classmethod
    def GetCurrProjIndex(cls)              -> int:  return cls._currProjIndex
-
-   @classmethod
-   def GetCurrTaskId(   cls)              -> int:  return cls._currTaskId
-
-   @classmethod
-   def GetCurrTaskIndex(cls)              -> int:  return cls._currTaskIndex
 
    @classmethod
    def IsProjListVis(   cls)              -> bool: return cls._isProjListVis
@@ -80,12 +71,6 @@ class MytState:
 
    @classmethod
    def SetCurrProjIndex(cls, value: int)  -> None: cls._currProjIndex = value
-
-   @classmethod
-   def SetCurrTaskId(   cls, value: int)  -> None: cls._currTaskId    = value
-
-   @classmethod
-   def SetCurrTaskIndex(cls, value: int)  -> None: cls._currTaskIndex = value
 
    @classmethod
    def SetIsProjListVis(cls, value: bool) -> None: cls._isProjListVis = value
@@ -130,10 +115,7 @@ def FileLoad() -> bool:
       # Split the line
       part = line.split('\t')
 
-      if   (part[0] == MYT_STATE.CURR_TASK_ID):
-         MytState.SetCurrTaskId(IntFromStr(part[1]))
-         
-      elif (part[0] == MYT_STATE.CURR_PROJ_ID):
+      if   (part[0] == MYT_STATE.CURR_PROJ_ID):
          MytState.SetCurrProjId(IntFromStr(part[1]))
 
       elif (part[0] == MYT_STATE.IS_SHOWING_PROJ_LIST):
@@ -163,7 +145,6 @@ def FileStore() -> bool:
    
    file = open(MYT_STATE.FILE, 'w')
 
-   file.write(MYT_STATE.CURR_TASK_ID         + '\t' + StrFromInt( MytState.GetCurrTaskId()) + '\n')
    file.write(MYT_STATE.CURR_PROJ_ID         + '\t' + StrFromInt( MytState.GetCurrProjId()) + '\n')
    file.write(MYT_STATE.IS_SHOWING_PROJ_LIST + '\t' + StrFromBool(MytState.IsProjListVis()) + '\n')
    file.write(MYT_STATE.IS_SHOWING_TASK_WORK + '\t' + StrFromBool(MytState.IsTaskWorkVis()) + '\n')
@@ -182,12 +163,6 @@ def FileStore() -> bool:
 def GetCurrProjId() -> int:
    return MytState.GetCurrProjId()
 
-###############################################################################
-# Get current task id
-###############################################################################
-def GetCurrTaskId() -> int:
-   return MytState.GetCurrTaskId()
-   
 ###############################################################################
 # is the display showing the project list
 ###############################################################################
@@ -265,12 +240,6 @@ def SetIsTaskWorkVis(value: bool) -> None:
 ###############################################################################
 def SetCurrProjId(value: int) -> None:
    MytState.SetCurrProjId(value)
-
-###############################################################################
-# set the current Task id
-###############################################################################
-def SetCurrTaskId(value: int) -> None:
-   MytState.SetCurrTaskId(value)
 
 ###############################################################################
 # Start up the status routines.

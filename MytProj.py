@@ -24,7 +24,7 @@ class MytProj:
    
    _clsIdMax: int = 0
 
-   def __init__(self, id: int = 0, isVis: bool = False, name: str = "", desc: str = ""):
+   def __init__(self, id: int = 0, isVis: bool = True, name: str = "", desc: str = ""):
       
       self._id:      int   = id;
       self._name:    str   = name
@@ -109,7 +109,7 @@ class MytProj:
 ###############################################################################
 # Create
 ###############################################################################
-def Create(id: int = 0, isVis: bool = False, name: str = "", desc: str = "") -> MytProj:
+def Create(id: int = 0, isVis: bool = True, name: str = "", desc: str = "") -> MytProj:
    return MytProj(id, isVis, name, desc)
 
 ###############################################################################

@@ -51,6 +51,9 @@ class MytTaskList:
       if (not os.path.exists(MYT_TASKLIST.FILE)):
          return False
 
+      # Clear anything that might currently exist
+      cls._list = []
+
       # Read in the file.
       file: TextIOWrapper
       try:
