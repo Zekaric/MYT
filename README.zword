@@ -12,9 +12,9 @@ h	|chapter| - Discussion
 
 	I had made attempts before using JavaScript and PHP.  First time just ham fisting a solution where there was JavaScript and PHP used together but that ended up being a mess of who does what.  Second time trying to be more heavy on the client side and light on the PHP/server side.  Sort of worked.  Hard to maintain.  Then very light on the client side and majority of the work in PHP on the server side.  That was the state of the last incarnation.  It worked but was difficult to maintain and PHP was a pain.  
 
-	In the end, none of the above was simple enough and PHP was not my language of choice.  I was using it so that I could have the web site hosted by my NAS which has a web server that can only do PHP.  I have given up on that idea and tried Python for this incarnation.  This project basically uses no JavaScript (for the most part.  One line is needed for the pulldown |<|select|>| HTML items for immediate processing on a change but that's it.  It is all Python and simple text files on the server.  
+	In the end, none of the above was simple enough and PHP was not my language of choice.  I was using it so that I could have the web site hosted by my NAS which has a web server that can only do PHP.  I have given up on that idea and tried Python for this incarnation.  This project basically uses no JavaScript (for the most part.  One line is needed for the pulldown |<|select|>| HTML items for immediate processing on a change but that's it.)  It is all Python and simple text files on the server.  
 
-	This incarnation of MYT when very fast compared to PHP.  Mainly because I solved a lot of the issues with the last PHP solution but all in all, working with Python instead of PHP was much more pleasing for me in general.  Python being closer to what I am used to (C programming language) with sane rules and such.  For my needs, it is fast enough.
+	This incarnation of MYT is very fast compared to PHP.  Mainly because I solved a lot of the issues with the last PHP solution but all in all, working with Python instead of PHP was much more pleasing for me in general.  Python being closer to what I am used to (C programming language) with sane rules and such.  For my needs, it is fast enough.
 
 h	|chapter| - Goals
 
@@ -45,20 +45,20 @@ h	|chapter| - Warning
 
 h	|chapter| - Install
 
-	Copy the files to a browser accessable folder on your web server.
+	Copy the files to a folder.
+	
+	Create an environment variable "MYT_DIR" where the files live.
 
-	Point your browser to that folder and you should be done.
-
-	The only potential gotcha may be tha you will have to ...
-
+	Run from the command line or create a bat file with this inside it...
+	
 .[
-	chown www-data:www-data * 
+	python "%MYT_DIR%/myt.py"
 ]
 
-	... and maybe ...
+	In your browser go to...
+	
+.[
+	localhost:8000
+]
 
-.	chmod 755 *
-
-	... on the files in that folder for it to work properly.
-
-	On your web server you |b |will| b| need to set it up to work with python.  You will need to adjust the first line of index.py to point to the python executable of the webserver.
+	You should now see the MYT interface.

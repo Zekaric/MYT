@@ -16,25 +16,23 @@ My Tea is a simple task tracker as well as a simple web program.  The ideal is s
 # 2 - Install
 
 
-Copy the files to a browser accessable folder on your web server.
+Copy the files to a folder.
 
-Point your browser to that folder and you should be done.
+Create an environment variable "MYT_DIR" where the files live.
 
-The only potential gotcha may be tha you will have to ...
-
-```
-chown www-data:www-data &#42;
-```
-
-... and maybe ...
+Run from the command line or create a bat file with this inside it...
 
 ```
-chmod 755 &#42;
+	python "%MYT_DIR%/myt.py"
 ```
 
-... on the files in that folder for it to work properly.
+In your browser go to...
 
-On your web server you **will** need to update it so that it can run Python CGI scripts.
+```
+	localhost:8000
+```
+
+You should now see the MYT interface.
 
 # 3 - Use
 

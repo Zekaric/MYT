@@ -10,21 +10,23 @@ h	|chapter| - Summary
 
 h	|chapter| - Install
 
-	Copy the files to a browser accessable folder on your web server.
+	Copy the files to a folder.
+	
+	Create an environment variable "MYT_DIR" where the files live.
 
-	Point your browser to that folder and you should be done.
+	Run from the command line or create a bat file with this inside it...
+	
+.[
+	python "%MYT_DIR%/myt.py"
+]
 
-	The only potential gotcha may be tha you will have to ...
+	In your browser go to...
+	
+.[
+	localhost:8000
+]
 
-.	chown www-data:www-data * 
-
-	... and maybe ...
-
-.	chmod 755 *
-
-	... on the files in that folder for it to work properly.
-
-	On your web server you |b |will| b| need to update it so that it can run Python CGI scripts.
+	You should now see the MYT interface.
 
 h	|chapter| - Use
 

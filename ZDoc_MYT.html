@@ -24,16 +24,15 @@
 
 
 <h1 class="zword"><a name="2">2 - Install</a></h1>
-<p class="zword">Copy the files to a browser accessable folder on your web server.</p>
-<p class="zword">Point your browser to that folder and you should be done.</p>
-<p class="zword">The only potential gotcha may be tha you will have to ...</p>
-<p class="zwordPre">chown www-data:www-data *
+<p class="zword">Copy the files to a folder.</p>
+<p class="zword">Create an environment variable "MYT_DIR" where the files live.</p>
+<p class="zword">Run from the command line or create a bat file with this inside it...</p>
+<p class="zwordPre">	python "%MYT_DIR%/myt.py"
 </p>
-<p class="zword">... and maybe ...</p>
-<p class="zwordPre">chmod 755 *
+<p class="zword">In your browser go to...</p>
+<p class="zwordPre">	localhost:8000
 </p>
-<p class="zword">... on the files in that folder for it to work properly.</p>
-<p class="zword">On your web server you <strong>will</strong> need to update it so that it can run Python CGI scripts.</p>
+<p class="zword">You should now see the MYT interface.</p>
 
 
 <h1 class="zword"><a name="3">3 - Use</a></h1>
