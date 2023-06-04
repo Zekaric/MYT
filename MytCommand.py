@@ -98,26 +98,19 @@ class COMMAND:
 ###############################################################################
 # process the command.
 ###############################################################################
-def Process(form: cgi.FieldStorage) -> bool:
+def Process(param) -> bool:
 
    command = ""
    id      = 0
    value   = ""
 
    # For local debugging purposes.
-   if (COMMAND.DEBUG_IS_ON):
-      command = COMMAND.DEBUG_CMD
-      id      = COMMAND.DEBUG_ID
-      value   = COMMAND.DEBUG_VAL
-
-   if (COMMAND.CMD in form):
-      command = form.getvalue(COMMAND.CMD)
-
-   if (COMMAND.ID in form):
-      id = IntFromStr(form.getvalue(COMMAND.ID))
-
-   if (COMMAND.VALUE in form):
-      value = form.getvalue(COMMAND.VALUE)
+   if (COMMAND.CMD   in param):
+      command =            param[COMMAND.CMD][0]
+   if (COMMAND.ID    in param):
+      id      = IntFromStr(param[COMMAND.ID][0])
+   if (COMMAND.VALUE in param):
+      value   =            param[COMMAND.VALUE][0]
 
    return _Process(command, id, value)
 

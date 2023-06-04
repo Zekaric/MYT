@@ -51,11 +51,9 @@ class MytDisplay:
 ###############################################################################
 # Process the display
 ###############################################################################
-def Process():
+def Process() -> str:
 
-   print("Content-Type: text/html\n\n")
-
-   print("""<!DOCTYPE html>
+   value = """<!DOCTYPE html>
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
 
  <head>
@@ -66,18 +64,18 @@ def Process():
  </head>
 
  <body>
-""")
+"""
 
    if (MytState.IsProjListVis()):
-      print("""
+      value += """
   <h1>Zekaric : MYT Projects</h1>
-""")
-      _DisplayProjList()
+"""
+      value += _DisplayProjList()
    else:
-      print("""
+      value += """
   <h1>Zekaric : MYT Tasks</h1>
-""")
-      _DisplayTaskList()
+"""
+      value += _DisplayTaskList()
 
    #DEBUG
    #_DisplayDebug()
@@ -85,9 +83,11 @@ def Process():
    #_DisplayDebugCmd()
    #_DisplayDebugEnv()
 
-   print("""
+   value += """
  </body>
-</html>""")
+</html>"""
+
+   return value
 
 ###############################################################################
 # Set the command that was to be processed
@@ -114,9 +114,9 @@ def DebugSetForm(form: cgi.FieldStorage) -> None:
 ###############################################################################
 # Display the project list.
 ###############################################################################
-def _DisplayProjList():
+def _DisplayProjList() -> str:
 
-   print("""
+   value = """
   <table>
    <tbody>
     <tr>
@@ -135,7 +135,7 @@ def _DisplayProjList():
        goToTaskBtn = _GetButtonCmd("l",  "Go To Tasks"),
        hideAllBtn  = _GetButtonCmd("p0", "{img} {img} {img}".format(img = _GetBit(StrFromBool(False)))),
        showAllBtn  = _GetButtonCmd("p1", "{img} {img} {img}".format(img = _GetBit(StrFromBool(True)))),
-       newProjFld  = _GetInputCmdVal("pa", "New Project Name", 15)))
+       newProjFld  = _GetInputCmdVal("pa", "New Project Name", 15))
 
    isAlt = False;
    projCount = MytProjList.GetCount()
@@ -149,7 +149,7 @@ def _DisplayProjList():
       nameValue  = _GetInputCmdIdVal("pn", itemp, proj.GetName(), 15)
       descValue  = _GetInputCmdIdVal("pd", itemp, proj.GetDesc(), 200)
 
-      print("""
+      value += """
     {tr}
      <td class="bool">{isVis}</td>
      <td class="num" >{id}</td>
@@ -160,22 +160,24 @@ def _DisplayProjList():
       id    = proj.GetId(),
       isVis = isVisValue,
       name  = nameValue,
-      desc  = descValue))
+      desc  = descValue)
 
       isAlt = not isAlt
 
-   print("""
+   value += """
     </tr>
    </tbody>
   </table>
-""")
+"""
+
+   return value
 
 ###############################################################################
 # Display the task list.
 ###############################################################################
-def _DisplayTaskList() -> None:
+def _DisplayTaskList() -> str:
 
-   print("""
+   value = """
   <table>
    <tbody>
     <tr>
@@ -200,7 +202,9 @@ def _DisplayTaskList() -> None:
       goToProjs    = _GetButtonCmd("l", "Go To Projects"),
       stateVisList = _DisplayTaskList_StateVisList(),
       projVisList  = _DisplayTaskList_ProjVisList(),
-      taskList     = _DisplayTaskList_TaskList()))
+      taskList     = _DisplayTaskList_TaskList())
+
+   return value
 
 ###############################################################################
 def _DisplayTaskList_ProjVisList() -> str:

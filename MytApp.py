@@ -31,9 +31,9 @@ def Start():
    #cgitb.enable(display = 0, logdir = "/PythonScript.log")
 
    # create the classes.
-   MytState.Start();
-   MytProjList.Start();
-   MytTaskList.Start();
+   MytState.Start()
+   MytProjList.Start()
+   MytTaskList.Start()
 
    # Process the command
    MytCommand.Process(cgi.FieldStorage())
